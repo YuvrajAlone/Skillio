@@ -8,7 +8,9 @@ function App() {
     <>
       <h1>yeahh it's your first project</h1>
       <Show when="signed-out">
-         <SignInButton mode='modal'/>
+         <SignInButton mode='modal'>
+          <button>Login</button>
+         </SignInButton>
       </Show>
       <Show when="signed-in">
          <UserButton/>
