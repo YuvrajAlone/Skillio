@@ -5,8 +5,12 @@ import User from "../models/User.js";
 export const inngest = new Inngest ({id: "skillio"});
 
 const createUser = inngest.createFunction(
-    {id:"create-user"},
-    {event:"clerk/user.created"},
+    {
+     id: "create-user",
+     triggers:[
+        {event: "clerk/user.created"}
+     ]
+    },
     async({event}) => {
         await connectDB()
         const {id,email_addresses,first_name,last_name}=event.data;
@@ -20,8 +24,12 @@ const createUser = inngest.createFunction(
 );
 
 const updateUser = inngest.createFunction(
-    {id:"update-user"},
-    {event: "clerk/user.updated"},
+    {
+     id: "update-user",
+     triggers:[
+        {event: "clerk/user.updated"}
+     ]
+    },
     async({event}) => {
         await connectDB();
         const {id,email_addresses,first_name,last_name}=event.data;
@@ -36,8 +44,12 @@ const updateUser = inngest.createFunction(
 );
 
 const deleteUser = inngest.createFunction(
-    {id:"delete-user"},
-    {event:"clerk/user.deleted"},
+    {
+     id: "delete-user",
+     triggers:[
+        {event: "clerk/user.deleted"}
+     ]
+    },
     async ({event}) => {
         await connectDB();
         const {id} = event.data;
