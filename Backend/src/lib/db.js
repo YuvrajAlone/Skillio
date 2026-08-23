@@ -3,10 +3,10 @@ import {ENV} from "./env.js";
 
 export const connectDB = async()=>{
     try {
-        const conn = await mongoose.connect(ENV.DB_URL);
-        console.log("Connected To MongoDB:", conn.connection.host);
+        await mongoose.connect(ENV.DB_URL);
+        console.log("Connected To MongoDB");
     } catch (error) {
         console.error("Error Connecting", error);
-        process.exit(1);
+        throw error;
     }
 }
