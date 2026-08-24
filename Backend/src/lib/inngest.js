@@ -1,6 +1,7 @@
 import {Inngest} from "inngest";
 import {connectDB} from "./db.js";
 import User from "../models/User.js";
+import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 
 export const inngest = new Inngest ({id: "skillio"});
 
@@ -17,9 +18,13 @@ const createUser = inngest.createFunction(
         const newUser = {
             clerkId: id,
             email: email_addresses[0]?.email_address,
-            name: `${first_name || ""} ${last_name || ""}`
+            name: `${first_name || ""} ${last_name || ""}`.trim()
         };
-     await User.create(newUser)
+     await User.create(newUser);
+     await upsertStreamUser({
+        id: newUser.clerkId.toString(),
+        name: newUser.name
+     });
     }
 );
 
@@ -33,13 +38,18 @@ const updateUser = inngest.createFunction(
     async({event}) => {
         await connectDB();
         const {id,email_addresses,first_name,last_name}=event.data;
+        const updatedName = `${first_name || ""} ${last_name || ""}`.trim();
         await User.findOneAndUpdate(
          {clerkId: id},
          {
-           name: `${first_name || ""} ${last_name || ""}`,
+           name: updatedName,
            email: email_addresses[0]?.email_address
          }
         );
+        await upsertStreamUser({
+            id: id.toString(),
+            name: updatedName
+        });
     }
 );
 
@@ -54,6 +64,7 @@ const deleteUser = inngest.createFunction(
         await connectDB();
         const {id} = event.data;
         await User.deleteOne({clerkId:id});
+        await deleteStreamUser(id.toString())
     }
 );
 
