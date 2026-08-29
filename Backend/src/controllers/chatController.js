@@ -9,6 +9,6 @@ export async function getStreamToken(req,res) {
             userName: req.user.name
         })
     } catch (error) {
-        
+        res.status(500).json({message: "Internal Server Error"});
     }
 }
