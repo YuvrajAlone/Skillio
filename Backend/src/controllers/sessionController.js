@@ -50,7 +50,7 @@ export async function activeSessions(_, res) {
       .populate("host", "name email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
-    res.status(201).json({ sessions });
+    res.status(200).json({ sessions });
   } catch (error) {
     console.error("Error in activeSessions controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
@@ -98,9 +98,22 @@ export async function joinSession(req, res) {
 
     const session = await Session.findById(id);
 
-    if (!session) return res.status(402).json({ message: "Session not found" });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+
+    if (session.status !== "active") {
+      return res
+        .status(400)
+        .json({ message: "Cannot join a completed session" });
+    }
+
+    if (session.host.toString() === userId.toString()) {
+      return res
+        .status(400)
+        .json({ message: "Host cannot join their own session as participant" });
+    }
+
     if (session.participant)
-      return res.status(402).json({ message: "Session full" });
+      return res.status(409).json({ message: "Session full" });
 
     session.participant = userId;
     await session.save();
@@ -122,20 +135,20 @@ export async function endSession(req, res) {
 
     const session = await Session.findById(id);
 
-    if (!session) return res.status(400).json({ message: "Status not found" });
+    if (!session) return res.status(404).json({ message: "Status not found" });
 
     if (session.host.toString() !== userId.toString()) {
-      res.status(400).json({ message: "Only the host can end the session" });
+      res.status(403).json({ message: "Only the host can end the session" });
     }
-
-    session.status = "completed";
-    await session.save();
 
     const call = streamClient.video.call("default", session.callId);
     await call.delete({ hard: true });
 
     const channel = chatClient.channel("messaging", session.callId);
     await channel.delete();
+
+    session.status = "completed";
+    await session.save();
 
     res.status(200).json({ session, message: "Session ended successfully" });
   } catch (error) {
