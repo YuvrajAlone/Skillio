@@ -20,7 +20,7 @@ function HomePage() {
             to={"/"}
             className="flex items-center gap-1.5 hover:scale-105 transition-transform duration-200"
           >
-            <div className="">
+            <div>
               <BrainCircuit className="size-5 text-white" />
             </div>
             <div className="flex flex-col">
@@ -106,7 +106,7 @@ function HomePage() {
           </div>
           {/* RIGHT IMAGE */}
           <img
-            src="/desktop.png"
+            src="/homepage.png"
             alt="CodeCollab Platform"
             className="w-full h-auto rounded-3xl shadow-2xl border-4 border-base-200 hover:scale-105 transition-transform duration-500 -ml-4"
           />
