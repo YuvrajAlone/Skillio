@@ -5,8 +5,6 @@ import { UserButton } from "@clerk/react";
 function Navbar() {
   const location = useLocation();
 
-  console.log(location);
-
   const isActive = (path) => location.pathname === path;
   return (
     <nav className="bg-base-100 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50">

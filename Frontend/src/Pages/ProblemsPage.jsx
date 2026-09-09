@@ -2,9 +2,17 @@ import Navbar from "../components/Navbar.jsx";
 import { PROBLEMS } from "../data/problems.js";
 import { Link } from "react-router";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
+import { useState } from "react";
 
 function ProblemsPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const problems = Object.values(PROBLEMS);
+
+  const filteredProblems = problems.filter((problem) =>
+    problem.title.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
     <div className="min-h-screen bg-[#09090b]">
       <Navbar />
@@ -14,14 +22,23 @@ function ProblemsPage() {
           <h1 className="text-4xl font-bold mb-2 text-purple-700">
             Practice Problems
           </h1>
-          <p className="text-white/70">
-            Sharpen your coding skills with these curated problems
-          </p>
+          <div class="mb-8 flex items-end justify-between">
+            <p className="text-white/70">
+              Sharpen your coding skills with these curated problems
+            </p>
+            <input
+              type="text"
+              placeholder="Search problems..."
+              className="input input-sm w-70  bg-[#18181b] text-white border-white/20 -translate-y-1"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* PROBLEMS LIST */}
         <div className="space-y-4">
-          {problems.map((problem) => (
+          {filteredProblems.map((problem) => (
             <Link
               key={problem.id}
               to={`/problem/${problem.id}`}

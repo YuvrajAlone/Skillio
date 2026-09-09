@@ -14,3 +14,20 @@
   scrollbar-color: white transparent;
   scrollbar-width: thin;
 }
+
+.thin-scrollbar {
+  scrollbar-color: white transparent;
+  scrollbar-width: thin;
+}
+
+.input:focus,
+.input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.select:focus {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
