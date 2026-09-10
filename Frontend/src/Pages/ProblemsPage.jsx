@@ -22,7 +22,7 @@ function ProblemsPage() {
           <h1 className="text-4xl font-bold mb-2 text-purple-700">
             Practice Problems
           </h1>
-          <div class="mb-8 flex items-end justify-between">
+          <div className="mb-8 flex items-end justify-between">
             <p className="text-white/70">
               Sharpen your coding skills with these curated problems
             </p>

@@ -5,6 +5,7 @@ import cors from "cors";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./lib/inngest.js";
 import { clerkMiddleware } from "@clerk/express";
+import codeRoutes from "./routes/codeRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
 
@@ -16,6 +17,7 @@ app.use(clerkMiddleware());
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/code", codeRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json("Done");
