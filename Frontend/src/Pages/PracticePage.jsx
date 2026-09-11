@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar.jsx";
 import ProblemDescription from "../components/ProblemDescription.jsx";
 import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import OutputPanel from "../components/OutputPanel.jsx";
-import { executeCode } from "../lib/executeCode.js";
+import { executeCode } from "../api/executeCode.js";
 import toast from "react-hot-toast";
 
 function PracticePage() {
