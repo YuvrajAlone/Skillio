@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/react";
 const { getToken } = useAuth();
 const token = await getToken();
 
