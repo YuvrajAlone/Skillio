@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import { useState, useEffect } from "react";
+import { useAuth } from "@clerk/react";
 import { PROBLEMS } from "../data/problems.js";
 import { Group, Panel, Separator } from "react-resizable-panels";
 import Navbar from "../components/Navbar.jsx";
@@ -12,6 +13,7 @@ import toast from "react-hot-toast";
 function PracticePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { getToken } = useAuth();
 
   const [currentProblemId, setCurrentProblemId] = useState("two-sum");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
@@ -70,7 +72,9 @@ function PracticePage() {
     setIsRunning(true);
     setOutput(null);
 
-    const result = await executeCode(selectedLanguage, code);
+    const token = await getToken();
+
+    const result = await executeCode(selectedLanguage, code, token);
     setOutput(result);
     setIsRunning(false);
 
