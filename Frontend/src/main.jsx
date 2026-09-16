@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AxiosInterceptor from "./lib/AxiosInterceptor.jsx";
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <ClerkProvider>
+          <AxiosInterceptor />
           <App />
         </ClerkProvider>
       </QueryClientProvider>
