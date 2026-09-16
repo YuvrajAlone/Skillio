@@ -26,7 +26,7 @@ function RecentSessions({ sessions, isLoading }) {
                 className={`card relative ${
                   session.status === "active"
                     ? "bg-success/10 border-success/30 hover:border-success/60"
-                    : "bg-base-200 border-base-300 hover:border-primary/30"
+                    : "bg-base-200/30 border-base-300 hover:border-primary/30"
                 }`}
               >
                 {session.status === "active" && (
@@ -39,35 +39,35 @@ function RecentSessions({ sessions, isLoading }) {
                 )}
 
                 <div className="card-body p-5">
-                  <div className="flex items-start gap-3 mb-4">
+                  <div className="flex items-start gap-2 mb-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                         session.status === "active"
                           ? "bg-linear-to-br from-success to-success/70"
-                          : "bg-linear-to-br from-primary to-secondary"
+                          : "bg-linear-to-br from-secondary"
                       }`}
                     >
                       <Code2 className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-base mb-1 truncate">
-                        {session.problem}
+                      <h3 className="font-bold text-xl p-2.5 pl-1 mb-1 truncate text-white/90">
+                        {session.host.name}
                       </h3>
                     </div>
                   </div>
 
                   <div className="space-y-2 text-sm opacity-80 mb-4">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      <span>
+                      <Clock className="w-4 h-4  text-blue-500/50" />
+                      <span className="text-white/70">
                         {formatDistanceToNow(new Date(session.createdAt), {
                           addSuffix: true,
                         })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      <span>
+                      <Users className="w-4 h-4  text-blue-500/50" />
+                      <span className="text-white/70">
                         {session.participant ? "2" : "1"} participant
                         {session.participant ? "s" : ""}
                       </span>
@@ -75,10 +75,10 @@ function RecentSessions({ sessions, isLoading }) {
                   </div>
 
                   <div className="flex items-center justify-between pt-3 border-t border-base-300">
-                    <span className="text-xs font-semibold opacity-80 uppercase">
+                    <span className="text-xs font-semibold opacity-80 uppercase text-white/70">
                       Completed
                     </span>
-                    <span className="text-xs opacity-40">
+                    <span className="text-xs opacity-40 text-white/70">
                       {new Date(session.updatedAt).toLocaleDateString()}
                     </span>
                   </div>

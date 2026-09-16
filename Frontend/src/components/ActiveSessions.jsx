@@ -51,19 +51,14 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-lg text-primary/80 truncate">
-                          {session.problem}
-                        </h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <CrownIcon className="size-4 text-blue-500/50" />
+                        <span className="font-bold text-lg text-primary/80 truncate">
+                          {session.host?.name}
+                        </span>
                       </div>
 
                       <div className="flex items-center gap-4 text-sm opacity-80">
-                        <div className="flex items-center gap-1.5">
-                          <CrownIcon className="size-4 text-blue-500/50" />
-                          <span className="font-medium text-white/70">
-                            {session.host?.name}
-                          </span>
-                        </div>
                         <div className="flex items-center gap-1.5">
                           <UsersIcon className="size-4 text-blue-500/50" />
                           <span className="text-xs text-white/70">
