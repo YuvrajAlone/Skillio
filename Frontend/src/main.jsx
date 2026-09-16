@@ -4,11 +4,7 @@ import { ClerkProvider } from "@clerk/react";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 

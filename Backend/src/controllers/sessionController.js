@@ -48,6 +48,7 @@ export async function activeSessions(_, res) {
   try {
     const sessions = await Session.find({ status: "active" })
       .populate("host", "name email clerkId")
+      .populate("participant", "name email clerkId")
       .sort({ createdAt: -1 })
       .limit(20);
     res.status(200).json({ sessions });

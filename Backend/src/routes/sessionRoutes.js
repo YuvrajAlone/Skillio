@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", protectRoute, createSession);
+router.post("/", protectRoute, createSession);
 router.get("/active", protectRoute, activeSessions);
 router.get("/recent", protectRoute, recentSessions);
 
