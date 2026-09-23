@@ -4,6 +4,7 @@ import HomePage from "./Pages/HomePage.jsx";
 import DashboardPage from "./Pages/DashboardPage.jsx";
 import ProblemsPage from "./Pages/ProblemsPage.jsx";
 import PracticePage from "./Pages/PracticePage.jsx";
+import SessionPage from "./Pages/SessionPage.jsx";
 import { Toaster } from "react-hot-toast";
 
 function App() {
@@ -27,6 +28,10 @@ function App() {
         <Route
           path="/problem/:id"
           element={isSignedIn ? <PracticePage /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/session/:id"
+          element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />}
         />
       </Routes>
       <Toaster toastOptions={{ duration: 3000 }} />

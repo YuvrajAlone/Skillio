@@ -82,6 +82,8 @@ function CodeEditorPanel({
             scrollbar: {
               vertical: "visible",
               verticalScrollbarSize: 5,
+              horizontal: "visible",
+              horizontalScrollbarSize: 5,
               alwaysConsumeMouseWheel: false,
             },
           }}

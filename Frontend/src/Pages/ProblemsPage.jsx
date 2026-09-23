@@ -38,44 +38,52 @@ function ProblemsPage() {
 
         {/* PROBLEMS LIST */}
         <div className="space-y-4">
-          {filteredProblems.map((problem) => (
-            <Link
-              key={problem.id}
-              to={`/problem/${problem.id}`}
-              className="card bg-base-200 hover:scale-[1.01] transition-transform border border-white/5"
-            >
-              <div className="card-body">
-                <div className="flex items-center justify-between gap-4">
-                  {/* LEFT SIDE */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Code2Icon className="size-6 text-green-500" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1 text-white">
-                          <h2 className="text-xl font-bold">{problem.title}</h2>
+          {filteredProblems.length > 0 ? (
+            filteredProblems.map((problem) => (
+              <Link
+                key={problem.id}
+                to={`/problem/${problem.id}`}
+                className="card bg-base-200 hover:scale-[1.01] transition-transform border border-white/5"
+              >
+                <div className="card-body">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* LEFT SIDE */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Code2Icon className="size-6 text-green-500" />
                         </div>
-                        <p className="text-sm text-white/50">
-                          {" "}
-                          {problem.category}
-                        </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1 text-white">
+                            <h2 className="text-xl font-bold">
+                              {problem.title}
+                            </h2>
+                          </div>
+                          <p className="text-sm text-white/50">
+                            {" "}
+                            {problem.category}
+                          </p>
+                        </div>
                       </div>
+                      <p className="text-white/80 mb-3">
+                        {problem.description.text}
+                      </p>
                     </div>
-                    <p className="text-white/80 mb-3">
-                      {problem.description.text}
-                    </p>
-                  </div>
-                  {/* RIGHT SIDE */}
+                    {/* RIGHT SIDE */}
 
-                  <div className="flex items-center gap-2 text-emerald-400">
-                    <span className="font-medium">Solve</span>
-                    <ChevronRightIcon className="size-5" />
+                    <div className="flex items-center gap-2 text-emerald-400">
+                      <span className="font-medium">Solve</span>
+                      <ChevronRightIcon className="size-5" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))
+          ) : (
+            <div className="text-center py-50 text-3xl text-white/50">
+              No problems found !
+            </div>
+          )}
         </div>
       </div>
     </div>

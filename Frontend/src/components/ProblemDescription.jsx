@@ -44,12 +44,7 @@ function ProblemDescription({
           <input
             type="text"
             placeholder="Search problems..."
-            value={
-              isOpen
-                ? search
-                : allProblems.find((p) => p.id === currentProblemId)?.title ||
-                  ""
-            }
+            value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setIsOpen(true);

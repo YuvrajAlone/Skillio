@@ -58,9 +58,10 @@ function HomePage() {
             </h1>
 
             <p className=" leading-relaxed max-w-xl ml-4 text-white">
-              Collaborate, code, and grow with Skillio. Practice real-world
-              interviews, solve problems together, and build the confidence to
-              land your next opportunity.
+              Skillio brings coding practice and technical interviews together,
+              allowing you to solve problems, strengthen your problem-solving
+              skills, and prepare for technical interviews through structured
+              coding sessions.
             </p>
             {/* FEATURE PILLS */}
             <div className="flex flex-wrap  gap-3  ml-4">

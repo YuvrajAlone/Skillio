@@ -11,7 +11,7 @@ import { Link } from "react-router";
 
 function ActiveSessions({ sessions, isLoading, isUserInSession }) {
   return (
-    <div className="lg:col-span-2 card bg-base-100 border-2 border-secondary/60 hover:border-secondary h-full">
+    <div className="lg:col-span-2 card bg-base-200/30 border-2 border-secondary/60 hover:border-secondary h-full">
       <div className="card-body">
         {/* HEADERS SECTION */}
         <div className="flex items-center justify-between mb-6">
@@ -41,7 +41,7 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
             sessions.map((session) => (
               <div
                 key={session._id}
-                className="card bg-base-200/30 border-2 border-base-200 hover:border-secondary/50"
+                className="card bg-base-200/50 border-2 border-base-200 hover:border-secondary/50"
               >
                 <div className="flex items-center justify-between gap-4 p-5">
                   {/* LEFT SIDE */}

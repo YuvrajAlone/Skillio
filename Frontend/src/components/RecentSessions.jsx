@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 
 function RecentSessions({ sessions, isLoading }) {
   return (
-    <div className="card bg-base-100 border-2 border-secondary/60 hover:border-secondary mt-8">
+    <div className="card bg-base-200/30 border-2 border-secondary/60 hover:border-secondary mt-8">
       <div className="card-body">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-linear-to-br from-secondary to-accent rounded-xl">
@@ -26,7 +26,7 @@ function RecentSessions({ sessions, isLoading }) {
                 className={`card relative ${
                   session.status === "active"
                     ? "bg-success/10 border-success/30 hover:border-success/60"
-                    : "bg-base-200/30 border-base-300 hover:border-primary/30"
+                    : "bg-base-200/50 border-base-300 hover:border-primary/30"
                 }`}
               >
                 {session.status === "active" && (
