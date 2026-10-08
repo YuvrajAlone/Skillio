@@ -10,9 +10,12 @@ import { PROBLEMS } from "../data/problems";
 import { executeCode } from "../api/executeCode.js";
 import Navbar from "../components/Navbar";
 import { Group, Panel, Separator } from "react-resizable-panels";
-import { Loader2Icon, LogOutIcon } from "lucide-react";
+import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditorPanel.jsx";
 import OutputPanel from "../components/OutputPanel.jsx";
+import useStreamClient from "../hooks/useStreamClient.js";
+import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
+import VideoCallUI from "../components/VideoCallUI";
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -39,6 +42,9 @@ function SessionPage() {
   const isParticipant = session?.participant?.clerkId === user?.id;
 
   const searchRef = useRef(null);
+
+  const { call, channel, chatClient, isInitializingCall, streamClient } =
+    useStreamClient(session, loadingSession, isHost, isParticipant);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -336,7 +342,45 @@ function SessionPage() {
             </Group>
           </Panel>
           <Separator className="w-1.5 bg-[#18181B] border-x border-[#27272A] hover:bg-[#27272A] transition-colors" />
-          <Panel defaultSize="50%" minSize="30%"></Panel>
+          {/* RIGHT PANEL - VIDEO CALLS & CHAT */}
+          <Panel defaultSize="50%" minSize="30%">
+            <div className="h-full bg-base-100 p-4 overflow-auto">
+              {isInitializingCall ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4" />
+                    <p className="text-lg text-primary">
+                      Connecting to video call...
+                    </p>
+                  </div>
+                </div>
+              ) : !streamClient || !call ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="card bg-base-100 shadow-xl max-w-md">
+                    <div className="card-body items-center text-center">
+                      <div className="w-24 h-24 bg-error/10 rounded-full flex items-center justify-center mb-4">
+                        <PhoneOffIcon className="w-12 h-12 text-error" />
+                      </div>
+                      <h2 className="card-title text-2xl text-white/70">
+                        Connection Failed
+                      </h2>
+                      <p className="text-white/70">
+                        Unable to connect to the video call
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full">
+                  <StreamVideo client={streamClient}>
+                    <StreamCall call={call}>
+                      <VideoCallUI chatClient={chatClient} channel={channel} />
+                    </StreamCall>
+                  </StreamVideo>
+                </div>
+              )}
+            </div>
+          </Panel>
         </Group>
       </div>
     </div>
