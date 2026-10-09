@@ -25,7 +25,4 @@ app.get("/", (req, res) => {
 
 connectDB();
 
-app.listen(3000, () => {
-  console.log(`Server running on port`);
-});
 export default app;
