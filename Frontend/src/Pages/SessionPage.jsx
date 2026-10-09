@@ -1,5 +1,5 @@
 import { useUser, useAuth } from "@clerk/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   useEndSession,
@@ -34,9 +34,6 @@ function SessionPage() {
     refetch,
   } = useSessionById(id);
 
-  const joinSessionMutation = useJoinSession();
-  const endSessionMutation = useEndSession();
-
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
   const isParticipant = session?.participant?.clerkId === user?.id;
@@ -45,6 +42,9 @@ function SessionPage() {
 
   const { call, channel, chatClient, isInitializingCall, streamClient } =
     useStreamClient(session, loadingSession, isHost, isParticipant);
+
+  const joinSessionMutation = useJoinSession();
+  const endSessionMutation = useEndSession();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -80,6 +80,113 @@ function SessionPage() {
     problemData?.starterCode?.[selectedLanguage] || "",
   );
 
+  const codeRef = useRef(code);
+  const languageRef = useRef(selectedLanguage);
+  const syncTimeoutRef = useRef(null);
+  const skipStarterResetRef = useRef(false);
+
+  useEffect(() => {
+    codeRef.current = code;
+  }, [code]);
+
+  useEffect(() => {
+    languageRef.current = selectedLanguage;
+  }, [selectedLanguage]);
+
+  const sendCodeEvent = useCallback(
+    async (
+      type,
+      codeValue = codeRef.current,
+      languageValue = languageRef.current,
+    ) => {
+      if (!call || !isParticipant) return;
+
+      try {
+        await call.sendCustomEvent({
+          type,
+          payload: {
+            code: codeValue,
+            language: languageValue,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to sync code:", error);
+      }
+    },
+    [call, isParticipant],
+  );
+
+  useEffect(() => {
+    if (!call) return;
+
+    const unsubscribe = call.on("custom", async (event) => {
+      const customEvent = event.custom;
+
+      if (!customEvent) return;
+
+      // HOST receives participant code
+      if (
+        isHost &&
+        (customEvent.type === "skillio_code_sync" ||
+          customEvent.type === "skillio_code_change")
+      ) {
+        const { code: incomingCode, language } = customEvent.payload || {};
+
+        if (typeof incomingCode !== "string") return;
+
+        if (language && language !== selectedLanguage) {
+          skipStarterResetRef.current = true;
+          setSelectedLanguage(language);
+        }
+
+        setCode(incomingCode);
+        codeRef.current = incomingCode;
+      }
+
+      // PARTICIPANT responds when host asks for current code
+      if (isParticipant && customEvent.type === "skillio_code_request") {
+        await sendCodeEvent(
+          "skillio_code_sync",
+          codeRef.current,
+          languageRef.current,
+        );
+      }
+    });
+
+    return unsubscribe;
+  }, [call, isHost, isParticipant, selectedLanguage, sendCodeEvent]);
+
+  useEffect(() => {
+    if (!call) return;
+
+    let timeoutId;
+
+    if (isHost) {
+      call
+        .sendCustomEvent({
+          type: "skillio_code_request",
+          payload: {},
+        })
+        .catch((error) => {
+          console.error("Failed to request participant code:", error);
+        });
+    }
+
+    if (isParticipant) {
+      timeoutId = setTimeout(() => {
+        sendCodeEvent(
+          "skillio_code_sync",
+          codeRef.current,
+          languageRef.current,
+        );
+      }, 300);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [call, isHost, isParticipant, sendCodeEvent]);
+
   useEffect(() => {
     if (!session || !user || loadingSession) return;
     if (isHost || isParticipant) return;
@@ -94,17 +201,45 @@ function SessionPage() {
   }, [session, loadingSession, navigate]);
 
   useEffect(() => {
-    if (problemData?.starterCode?.[selectedLanguage]) {
-      setCode(problemData.starterCode[selectedLanguage]);
+    if (!problemData?.starterCode?.[selectedLanguage]) return;
+
+    if (skipStarterResetRef.current) {
+      skipStarterResetRef.current = false;
+      return;
     }
+
+    setCode(problemData.starterCode[selectedLanguage]);
   }, [problemData, selectedLanguage]);
 
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
+
     setSelectedLanguage(newLang);
+    languageRef.current = newLang;
+
     const starterCode = problemData?.starterCode?.[newLang] || "";
+
     setCode(starterCode);
+    codeRef.current = starterCode;
+
     setOutput(null);
+
+    if (isParticipant && call) {
+      sendCodeEvent("skillio_code_change", starterCode, newLang);
+    }
+  };
+
+  const handleCodeChange = (value) => {
+    setCode(value);
+    codeRef.current = value;
+
+    if (!isParticipant || !call) return;
+
+    clearTimeout(syncTimeoutRef.current);
+
+    syncTimeoutRef.current = setTimeout(() => {
+      sendCodeEvent("skillio_code_change", value, languageRef.current);
+    }, 150);
   };
 
   const handleRunCode = async () => {
@@ -327,8 +462,9 @@ function SessionPage() {
                       code={code}
                       isRunning={isRunning}
                       onLanguageChange={handleLanguageChange}
-                      onCodeChange={(value) => setCode(value)}
+                      onCodeChange={handleCodeChange}
                       onRunCode={handleRunCode}
+                      readOnly={isHost}
                     />
                   </Panel>
 

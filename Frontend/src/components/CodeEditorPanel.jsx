@@ -9,6 +9,7 @@ function CodeEditorPanel({
   onLanguageChange,
   onCodeChange,
   onRunCode,
+  readOnly,
 }) {
   return (
     <div className="h-full bg-base-200 flex flex-col overflow-y-hidden">
@@ -23,6 +24,7 @@ function CodeEditorPanel({
             className="select select-sm  border-white/50 outline-none! shadow-none! ring-0! "
             value={selectedLanguage}
             onChange={onLanguageChange}
+            disabled={readOnly}
           >
             {Object.entries(LANGUAGE_CONFIG).map(([key, lang]) => (
               <option key={key} value={key}>
@@ -79,6 +81,7 @@ function CodeEditorPanel({
             scrollBeyondLastLine: false,
             automaticLayout: true,
             minimap: { enabled: false },
+            readOnly,
             scrollbar: {
               vertical: "visible",
               verticalScrollbarSize: 5,
