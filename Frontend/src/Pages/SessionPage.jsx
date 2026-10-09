@@ -124,6 +124,14 @@ function SessionPage() {
 
       if (!customEvent) return;
 
+      if (isHost && customEvent.type === "skillio_output_sync") {
+        const incomingOutput = customEvent.payload?.output;
+
+        if (incomingOutput && typeof incomingOutput === "object") {
+          setOutput(incomingOutput);
+        }
+      }
+
       // HOST receives participant code
       if (
         isHost &&
@@ -243,12 +251,41 @@ function SessionPage() {
   };
 
   const handleRunCode = async () => {
+    if (!isParticipant) return;
+
     setIsRunning(true);
     setOutput(null);
-    const token = await getToken();
-    const result = await executeCode(selectedLanguage, code, token);
-    setOutput(result);
-    setIsRunning(false);
+
+    try {
+      const token = await getToken();
+
+      const result = await executeCode(selectedLanguage, code, token);
+
+      // Participant sees their own output.
+      setOutput(result);
+
+      // Send the result to the host.
+      if (call) {
+        try {
+          await call.sendCustomEvent({
+            type: "skillio_output_sync",
+            payload: {
+              output: {
+                success: Boolean(result?.success),
+                output: String(result?.output ?? "").slice(0, 1000),
+                error: String(result?.error ?? "").slice(0, 1000),
+              },
+            },
+          });
+        } catch (syncError) {
+          console.error("Failed to sync output:", syncError);
+        }
+      }
+    } catch (error) {
+      console.error("Code execution failed:", error);
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleEndSession = () => {
