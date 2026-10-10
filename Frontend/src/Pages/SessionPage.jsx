@@ -84,6 +84,11 @@ function SessionPage() {
   const languageRef = useRef(selectedLanguage);
   const syncTimeoutRef = useRef(null);
   const skipStarterResetRef = useRef(false);
+  const selectedProblemRef = useRef(selectedProblem);
+
+  useEffect(() => {
+    selectedProblemRef.current = selectedProblem;
+  }, [selectedProblem]);
 
   useEffect(() => {
     codeRef.current = code;
@@ -107,6 +112,7 @@ function SessionPage() {
           payload: {
             code: codeValue,
             language: languageValue,
+            problem: selectedProblemRef.current,
           },
         });
       } catch (error) {
@@ -124,6 +130,43 @@ function SessionPage() {
 
       if (!customEvent) return;
 
+      if (
+        (isHost || isParticipant) &&
+        customEvent.type === "skillio_problem_change"
+      ) {
+        const { problem: incomingProblem, language } =
+          customEvent.payload || {};
+
+        const problemData = Object.values(PROBLEMS).find(
+          (item) => item.title === incomingProblem,
+        );
+
+        if (!problemData) return;
+
+        const nextLanguage =
+          typeof language === "string" &&
+          problemData.starterCode?.[language] !== undefined
+            ? language
+            : languageRef.current;
+
+        const nextCode = problemData.starterCode?.[nextLanguage] || "";
+
+        // Apply the selection in this browser.
+        selectedProblemRef.current = problemData.title;
+        languageRef.current = nextLanguage;
+        skipStarterResetRef.current = false;
+
+        setSelectedProblem(problemData.title);
+        setSelectedLanguage(nextLanguage);
+
+        setCode(nextCode);
+        codeRef.current = nextCode;
+
+        setOutput(null);
+        setSearchInput("");
+        setIsProblemListOpen(false);
+      }
+
       if (isHost && customEvent.type === "skillio_output_sync") {
         const incomingOutput = customEvent.payload?.output;
 
@@ -138,12 +181,32 @@ function SessionPage() {
         (customEvent.type === "skillio_code_sync" ||
           customEvent.type === "skillio_code_change")
       ) {
-        const { code: incomingCode, language } = customEvent.payload || {};
+        const {
+          code: incomingCode,
+          language,
+          problem,
+        } = customEvent.payload || {};
+
+        if (typeof problem === "string") {
+          const incomingProblem = Object.values(PROBLEMS).find(
+            (item) => item.title === problem,
+          );
+
+          if (
+            incomingProblem &&
+            incomingProblem.title !== selectedProblemRef.current
+          ) {
+            selectedProblemRef.current = incomingProblem.title;
+            skipStarterResetRef.current = true;
+            setSelectedProblem(incomingProblem.title);
+          }
+        }
 
         if (typeof incomingCode !== "string") return;
 
         if (language && language !== selectedLanguage) {
           skipStarterResetRef.current = true;
+          languageRef.current = language;
           setSelectedLanguage(language);
         }
 
@@ -220,6 +283,9 @@ function SessionPage() {
   }, [problemData, selectedLanguage]);
 
   const handleLanguageChange = (e) => {
+    clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = null;
+
     const newLang = e.target.value;
 
     setSelectedLanguage(newLang);
@@ -234,6 +300,41 @@ function SessionPage() {
 
     if (isParticipant && call) {
       sendCodeEvent("skillio_code_change", starterCode, newLang);
+    }
+  };
+
+  const handleProblemChange = (problem) => {
+    clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = null;
+
+    const language = languageRef.current;
+    const starterCode = problem.starterCode?.[language] || "";
+
+    // Update the current browser immediately.
+    selectedProblemRef.current = problem.title;
+    skipStarterResetRef.current = false;
+
+    setSelectedProblem(problem.title);
+    setCode(starterCode);
+    codeRef.current = starterCode;
+    setOutput(null);
+
+    setSearchInput("");
+    setIsProblemListOpen(false);
+
+    // Notify the other user.
+    if (call) {
+      call
+        .sendCustomEvent({
+          type: "skillio_problem_change",
+          payload: {
+            problem: problem.title,
+            language,
+          },
+        })
+        .catch((error) => {
+          console.error("Failed to sync problem:", error);
+        });
     }
   };
 
@@ -358,11 +459,9 @@ function SessionPage() {
                                       key={problem.id}
                                       type="button"
                                       className="w-full text-left px-3 py-2 hover:bg-base-200/50"
-                                      onClick={() => {
-                                        setSelectedProblem(problem.title);
-                                        setSearchInput("");
-                                        setIsProblemListOpen(false);
-                                      }}
+                                      onClick={() =>
+                                        handleProblemChange(problem)
+                                      }
                                     >
                                       {problem.title}
                                     </button>
